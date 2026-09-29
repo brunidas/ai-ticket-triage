@@ -1,0 +1,5 @@
+{
+  "id": "ticket-002",
+  "subject": "Duplicate charge on invoice INV-2231",
+  "description": "We were charged twice for the September subscription (charges referencing INV-2231 and INV-2231-R). Same amount, same day. Please reverse one charge and confirm by email."
+}

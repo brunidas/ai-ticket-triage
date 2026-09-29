@@ -1,0 +1,6 @@
+{
+  "id": "ticket-007",
+  "subject": "All payments failing with 503 for the last 10 minutes",
+  "description": "Every call to POST /v1/payments returns 503. Production checkout is down for all our customers. Started around 14:30 UTC. We need this escalated immediately.",
+  "logs": "2026-09-23T14:31:02Z POST /v1/payments 503 3012ms\nerror: upstream_unavailable\n2026-09-23T14:31:09Z POST /v1/payments 503 2987ms\n47 consecutive 503 responses in the last 10 minutes"
+}

@@ -1,0 +1,5 @@
+{
+  "id": "ticket-005",
+  "subject": "Password reset email never arrives",
+  "description": "Two users in our workspace are not receiving the password reset email. We checked spam folders and our domain allowlist is correct. Both users are blocked from logging in."
+}

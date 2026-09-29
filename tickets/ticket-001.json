@@ -1,0 +1,6 @@
+{
+  "id": "ticket-001",
+  "subject": "500 error when creating invoices via API",
+  "description": "Since this morning our integration fails when calling POST /v1/invoices. About 20% of requests return 500. The API key is valid and the same payload worked yesterday. Example request ID: req_8f31a2.",
+  "logs": "2026-09-23T14:02:11Z POST /v1/invoices 500 842ms\nerror: internal_error\nrequest_id=req_8f31a2\n2026-09-23T14:02:19Z POST /v1/invoices 200 411ms"
+}

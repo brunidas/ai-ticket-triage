@@ -1,0 +1,19 @@
+{
+  "ticket_id": "ticket-007",
+  "category": "api",
+  "priority": "P1",
+  "language": "en",
+  "is_urgent": true,
+  "summary": "POST /v1/payments is returning 503 for all requests; production checkout has been down for about 10 minutes.",
+  "first_response_draft": "We're aware of an active incident affecting POST /v1/payments (503 errors) and have escalated it to our engineering on-call team. We'll send updates every 15 minutes until it is resolved.",
+  "escalate": true,
+  "escalation_reason": "Ongoing production-wide payment failures for 10+ minutes with customer checkout impact; requires immediate on-call engineering attention.",
+  "confidence": 0.95,
+  "usage": {
+    "model": "example-model",
+    "prompt_tokens": 512,
+    "completion_tokens": 96,
+    "estimated_cost_usd": 0.0002,
+    "latency_ms": 1840
+  }
+}

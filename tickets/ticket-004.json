@@ -1,0 +1,5 @@
+{
+  "id": "ticket-004",
+  "subject": "App crashes on Android 14 when uploading a photo",
+  "description": "On two Pixel 7 devices (Android 14), the app closes instantly when selecting a photo from the gallery. The crash happens on 4 of 5 attempts. App version 3.8.1."
+}

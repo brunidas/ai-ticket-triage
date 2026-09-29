@@ -1,0 +1,72 @@
+{
+  "ticket-001": {
+    "category": "api",
+    "priority": "P2",
+    "language": "en",
+    "is_urgent": false,
+    "escalate": false
+  },
+  "ticket-002": {
+    "category": "billing",
+    "priority": "P2",
+    "language": "en",
+    "is_urgent": false,
+    "escalate": false
+  },
+  "ticket-003": {
+    "category": "integration",
+    "priority": "P2",
+    "language": "en",
+    "is_urgent": false,
+    "escalate": false
+  },
+  "ticket-004": {
+    "category": "bug",
+    "priority": "P3",
+    "language": "en",
+    "is_urgent": false,
+    "escalate": false
+  },
+  "ticket-005": {
+    "category": "account",
+    "priority": "P2",
+    "language": "en",
+    "is_urgent": false,
+    "escalate": false
+  },
+  "ticket-006": {
+    "category": "how_to",
+    "priority": "P4",
+    "language": "en",
+    "is_urgent": false,
+    "escalate": false
+  },
+  "ticket-007": {
+    "category": "api",
+    "priority": "P1",
+    "language": "en",
+    "is_urgent": true,
+    "escalate": true
+  },
+  "ticket-008": {
+    "category": "other",
+    "priority": "P4",
+    "language": "en",
+    "is_urgent": false,
+    "escalate": false
+  },
+  "ticket-009": {
+    "category": "billing",
+    "priority": "P3",
+    "language": "es",
+    "is_urgent": false,
+    "escalate": false
+  },
+  "ticket-010": {
+    "category": "bug",
+    "priority": "P3",
+    "language": "es",
+    "is_urgent": false,
+    "escalate": false
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "id": "ticket-010",
+  "subject": "La app se cierra al exportar un PDF",
+  "description": "Desde la última actualización, al exportar cualquier informe a PDF la aplicación se cierra sin aviso. Pasa en Windows 11 con Chrome 128.",
+  "logs": "console: TypeError: Cannot read properties of null (reading 'formatDate') at exportPdf (pdf-worker.js:118)"
+}

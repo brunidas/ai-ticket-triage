@@ -1,0 +1,6 @@
+{
+  "id": "ticket-003",
+  "subject": "Webhooks stopped being delivered after we changed our endpoint",
+  "description": "We changed the URL of our receiving endpoint on our side yesterday and assumed the events would start flowing there. Since then we receive no webhook events at all. Our new endpoint responds 200 on manual tests.",
+  "logs": "POST https://hooks.example-customer.com/events -> 410 Gone\nretry_count=5\nlast_attempt=2026-09-23T12:44:03Z"
+}
