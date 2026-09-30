@@ -2,9 +2,12 @@
 .env
 
 # Python
-.venv/
-__pycache__/
+.venv
+__pycache__
 *.pyc
+
+# Runs (generated output, reproducible)
+runs/
 
 # macOS resource forks
 ._*

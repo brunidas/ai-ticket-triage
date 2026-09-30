@@ -11,9 +11,8 @@ def build_messages(data):
     You are a support triage agent for a B2B SaaS company that sells an HTTP API for
     invoicing, subscriptions and online payments. Customers are companies that
     integrate our API into their own systems, so most tickets come from developers.
-    The critical paths are issuing invoices and processing payments: an outage on
-    those means our customers cannot charge their own end users, so it is always a
-    production incident.
+    The critical paths are issuing invoices and processing payments: when those stop
+    completely for many customers, it is a production incident.
 
     You respond ONLY with a JSON object. No text before it, no text after it, no
     markdown, no code fences, no explanations, no comments.
@@ -69,14 +68,18 @@ def build_messages(data):
     issue invoices at this moment, and there is no workaround. Outage of a
     critical endpoint, mass 5xx errors, data loss or corruption, a security
     incident in progress.
-    - "P2": work is blocked for specific users, or there is an active error, and
-    they have no workaround. One customer's integration failing, a webhook stream
-    that stopped, users locked out of their account, a duplicate charge that must
-    be reversed.
-    - "P3": there is a real problem, but work can continue. A workaround exists, or
-    the impact is partial, intermittent or cosmetic. An intermittent error affecting
-    a small percentage of requests, a wrong label on an invoice, a crash that does
-    not reproduce every time.
+    - "P2": work is blocked for specific users in a core flow, with no workaround.
+    Core flows are: logging in, calling our API, receiving webhook events, and money
+    (charges, invoices). Examples: one customer's integration failing, a webhook
+    stream that stopped, users locked out of their account, a duplicate charge that
+    must be reversed. This applies even if only a share of that customer's requests
+    fail and even if the endpoint still works for everyone else: for that customer,
+    work has stopped.
+    - "P3": there is a real problem, but the product as a whole still works. One
+    feature misbehaves - an app crash, a broken export, a wrong value - or the
+    customer is asking for a correction they can wait for. Examples: the app crashes
+    when uploading a photo, a report export fails, a wrong plan on an invoice, a
+    wrong label, a delay that does not block anyone.
     - "P4": no error and no blockage at all. Questions, how-to requests, paperwork,
     commercial proposals.
 
@@ -98,10 +101,16 @@ def build_messages(data):
 
     ESCALATION
     Set "escalate" to true ONLY when resolving the ticket requires an engineer or the
-    on-call team to change code, configuration or infrastructure. Examples: mass 5xx
-    errors, a service outage, a reproducible defect in our product, webhook delivery
-    failing on our side, data loss or corruption, a security issue, a regression after
-    a deploy.
+    on-call team to change code, configuration or infrastructure. Examples: an endpoint
+    returning 5xx to every request, a service outage affecting many customers, webhook
+    delivery failing on our side, data loss or corruption, a security incident, or a
+    regression after a deploy that breaks production.
+    A partial or intermittent failure affecting a minority of requests is NOT an
+    escalation: support gathers the details first, and engineering is pulled in only
+    if it grows or reproduces.
+    A defect, crash or bug affecting a single feature is NOT an escalation either: it
+    goes to the engineering backlog, not to on-call. Support acknowledges it, sets
+    expectations and follows up.
     Set "escalate" to false when support can resolve it without writing code: how-to
     questions, invoice corrections, refunds, duplicate charge reversals, account
     unblocks, password resets, permission changes, plan changes, commercial proposals.
@@ -133,7 +142,7 @@ def build_messages(data):
     0.7 and 0.9 when it is routine but slightly ambiguous, and below 0.7 when
     information is missing or the ticket fits several categories.'''   # las reglas
 
-    user = f"Subject: {data['subject']}\nDescription: {data['description']}"
+    user = f"Subject: {data['subject']}\nDescription: {data['description']}\nId: {data['id']}"
     if data.get("logs"):
         user += f"\nLogs:\n{data['logs']}"
 
@@ -159,12 +168,23 @@ try:
         load_dotenv()
         with OpenRouter(api_key=os.getenv("OPENROUTER_API_KEY")) as client:
             response = client.chat.send(
-                model="mistralai/mistral-small-24b-instruct-2501",
+                model="deepseek/deepseek-v4-flash",
                 messages=messages,
-                provider={"max_price": {"prompt": "0.10", "completion": "0.30"}},
+                provider={
+                    "max_price": {"prompt": "0.25", "completion": "1.30"},
+                    "order": ["streamlake", "baidu", "deepinfra", "gmicloud", "alibaba",
+                              "siliconflow", "novita", "parasail", "mancer", "open-inference",
+                              "atlas-cloud", "relace",
+                              "venice", "digitalocean", "azure"],
+                },
+                x_open_router_metadata="enabled",
+                temperature=0,
             )
 
         print(response.choices[0].message.content)
+        # --- debug: routing y costo ---
+        #print("routing:", response.openrouter_metadata.summary)
+        #print("cost:", response.usage.model_dump().get("cost"), "USD")
 
 except FileNotFoundError:
     print(f"No existe {json_file}")
