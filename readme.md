@@ -157,6 +157,26 @@ The lesson: when two rules claim the same ticket, **narrow one of them to match
 the distinction that already exists in the labels** — do not keep piling examples
 on top of both sides (each new clause can flip a different ticket).
 
+## Example tickets
+
+The repo ships 10 synthetic tickets (`tickets/ticket-001..010.json`) so anyone
+cloning it can run `python3 score.py` immediately — no data collection needed.
+
+Distribution:
+
+- **Categories:** api ×2, billing ×2, integration ×1, bug ×2, account ×1,
+  how_to ×1, other ×1.
+- **Languages:** 8 English, 2 Spanish (`ticket-009`, `ticket-010`).
+- **Urgent + escalated:** `ticket-007` is the only P1 / `escalate: true` — used to
+  prove the model does *not* escalate when the customer merely asks.
+- **With logs:** `ticket-001`, `ticket-003`, `ticket-007`, `ticket-010` (the rest
+  omit the field; `main.py` uses `.get("logs")` so nothing breaks).
+- **Ground truth:** `labels.json` has the expected classification per ticket. The
+  model never sees it — the scorer compares against it.
+- **Reference output:** `example-output.json` shows the structure the CLI produces.
+
+All fixtures are 100% synthetic — never real customer or employer tickets.
+
 ## Project structure
 
 - `main.py` — CLI + `build_messages()` (the system prompt lives here) + SDK call.
