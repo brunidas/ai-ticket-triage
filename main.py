@@ -75,12 +75,21 @@ def build_messages(data):
     must be reversed. This applies even if only a share of that customer's requests
     fail, even if the error is intermittent, and even if the endpoint still works for
     everyone else: for that customer, work has stopped.
-    - "P3": there is a real problem, but the product as a whole still works. One
+    - "P3": use it ONLY if NO core flow is blocked OR malfunctioning for the
+    customer — that is, logging in, calling our API, receiving webhook events and
+    money (charges, invoices) all work correctly. Money works correctly only when
+    the right amount was charged: a duplicate charge, a charge for the wrong amount,
+    or any money taken that should not have been means money is NOT working, so it
+    is "P2" — reversing a charge is not a routine invoice correction. If any core
+    flow is blocked or malfunctioning, it is "P2", even when only one customer is
+    affected, even when our product as a whole still works, and even when the
+    customer caused the problem. When that guard passes, P3 means: there is a real
+    problem, but no core flow is broken and no wrong amount of money moved. One
     feature misbehaves - an app crash, a broken export, a wrong value - or the
-    customer is asking for a correction to an invoice, a plan or a label that can
-    wait. Examples: the app crashes
-    when uploading a photo, a report export fails, a wrong plan on an invoice, a
-    wrong label, a delay that does not block anyone.
+    customer is asking for a correction to a label or a plan detail on an invoice
+    where the charged amount was correct. Examples: the app crashes when uploading a
+    photo, a report export fails, a wrong plan on an invoice, a wrong label, a delay
+    that does not block anyone.
     - "P4": no error and no blockage at all. Questions, how-to requests, paperwork,
     commercial proposals.
 
