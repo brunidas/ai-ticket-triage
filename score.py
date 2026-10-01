@@ -121,12 +121,12 @@ def main():
     for ticket_id, marks, hits in rows:
         lines.append(f"{ticket_id:12s} " + " ".join(f"{m:>9s}" for m in marks) + f"   {hits}/5")
     lines.append("")
-    lines.append(f"campos : {field_hits}/{total_fields}")
-    lines.append(f"tickets: {perfect_tickets}/{len(tickets)} perfectos")
+    lines.append(f"fields : {field_hits}/{total_fields}")
+    lines.append(f"tickets: {perfect_tickets}/{len(tickets)} perfect")
 
     if failures:
         lines.append("")
-        lines.append("detalle de fallos:")
+        lines.append("failures:")
         for ticket_id, field, detail in failures:
             lines.append(f"  {ticket_id:12s} {field:12s} {detail}")
 
@@ -139,12 +139,12 @@ def main():
 
     history = os.path.join(RUNS, "history.txt")
     with open(history, "a", encoding="utf-8") as f:
-        f.write(f"{stamp}  campos {field_hits}/{total_fields}  "
+        f.write(f"{stamp}  fields {field_hits}/{total_fields}  "
                 f"tickets {perfect_tickets}/{len(tickets)}\n")
 
     print()
-    print(f"guardado en {os.path.relpath(run_dir, HERE)}/")
-    print(f"historial  {os.path.relpath(history, HERE)}")
+    print(f"saved to {os.path.relpath(run_dir, HERE)}/")
+    print(f"history  {os.path.relpath(history, HERE)}")
 
 
 if __name__ == "__main__":

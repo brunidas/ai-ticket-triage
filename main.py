@@ -73,11 +73,12 @@ def build_messages(data):
     (charges, invoices). Examples: one customer's integration failing, a webhook
     stream that stopped, users locked out of their account, a duplicate charge that
     must be reversed. This applies even if only a share of that customer's requests
-    fail and even if the endpoint still works for everyone else: for that customer,
-    work has stopped.
+    fail, even if the error is intermittent, and even if the endpoint still works for
+    everyone else: for that customer, work has stopped.
     - "P3": there is a real problem, but the product as a whole still works. One
     feature misbehaves - an app crash, a broken export, a wrong value - or the
-    customer is asking for a correction they can wait for. Examples: the app crashes
+    customer is asking for a correction to an invoice, a plan or a label that can
+    wait. Examples: the app crashes
     when uploading a photo, a report export fails, a wrong plan on an invoice, a
     wrong label, a delay that does not block anyone.
     - "P4": no error and no blockage at all. Questions, how-to requests, paperwork,
@@ -105,9 +106,9 @@ def build_messages(data):
     returning 5xx to every request, a service outage affecting many customers, webhook
     delivery failing on our side, data loss or corruption, a security incident, or a
     regression after a deploy that breaks production.
-    A partial or intermittent failure affecting a minority of requests is NOT an
-    escalation: support gathers the details first, and engineering is pulled in only
-    if it grows or reproduces.
+    A partial or intermittent failure affecting a minority of requests is NEVER an
+    escalation, no matter which endpoint it is: support gathers the details first,
+    and engineering is pulled in only if it grows or reproduces.
     A defect, crash or bug affecting a single feature is NOT an escalation either: it
     goes to the engineering backlog, not to on-call. Support acknowledges it, sets
     expectations and follows up.
