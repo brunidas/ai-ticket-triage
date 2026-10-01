@@ -1,0 +1,2 @@
+openrouter==1.2.24
+python-dotenv==1.2.3
