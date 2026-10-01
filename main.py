@@ -77,19 +77,20 @@ def build_messages(data):
     everyone else: for that customer, work has stopped.
     - "P3": use it ONLY if NO core flow is blocked OR malfunctioning for the
     customer — that is, logging in, calling our API, receiving webhook events and
-    money (charges, invoices) all work correctly. Money works correctly only when
-    the right amount was charged: a duplicate charge, a charge for the wrong amount,
-    or any money taken that should not have been means money is NOT working, so it
-    is "P2" — reversing a charge is not a routine invoice correction. If any core
-    flow is blocked or malfunctioning, it is "P2", even when only one customer is
-    affected, even when our product as a whole still works, and even when the
-    customer caused the problem. When that guard passes, P3 means: there is a real
-    problem, but no core flow is broken and no wrong amount of money moved. One
-    feature misbehaves - an app crash, a broken export, a wrong value - or the
-    customer is asking for a correction to a label or a plan detail on an invoice
-    where the charged amount was correct. Examples: the app crashes when uploading a
-    photo, a report export fails, a wrong plan on an invoice, a wrong label, a delay
-    that does not block anyone.
+    money (charges, invoices) all still work for the customer. A duplicate charge —
+    the same charge applied twice, where one of them must be reversed — is a money
+    malfunction: it is "P2", because reversing a duplicate is not a routine invoice
+    correction. A single charge with a wrong plan or a wrong label on the invoice is
+    NOT a money malfunction: the money system did its job, so that is an invoice
+    correction and stays "P3". If any core flow is blocked or malfunctioning, it is
+    "P2", even when only one customer is affected, even when our product as a whole
+    still works, and even when the customer caused the problem. When that guard
+    passes, P3 means: there is a real problem, but no core flow is broken and no
+    duplicate charge exists. One feature misbehaves - an app crash, a broken export,
+    a wrong value - or the customer is asking for a correction to an invoice, a plan
+    or a label. Examples: the app crashes when uploading a photo, a report export
+    fails, a wrong plan on an invoice, a wrong label, a delay that does not block
+    anyone.
     - "P4": no error and no blockage at all. Questions, how-to requests, paperwork,
     commercial proposals.
 
