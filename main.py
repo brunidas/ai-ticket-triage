@@ -3,8 +3,23 @@ import sys
 import os 
 from openrouter import OpenRouter
 from dotenv import load_dotenv
+from pydantic import BaseModel, ValidationError
 
 load_dotenv()
+
+class Ticket(BaseModel):
+    ticket_id: str
+    category: str
+    priority: str
+    language: str
+    is_urgent: bool
+    escalate: bool
+    summary: str
+    first_response_draft: str
+    escalation_reason: str
+    confidence: float
+
+
 
 def build_messages(data):
     system = '''
@@ -162,7 +177,17 @@ def build_messages(data):
         {"role": "user", "content": user},
     ]
 
-
+def OpenRouter_output_verification(raw_string):
+    try:
+        data = json.loads(raw_string)
+        result = Ticket(**data)
+        return result
+    except json.JSONDecodeError as e:
+        print(f"The model did not return valid JSON: {e}")
+        return None
+    except ValidationError as e:
+        print(f"The JSON does not match the expected fields: {e}")
+        return None
 
 if len(sys.argv) > 1:
     ticket = sys.argv[1]
@@ -192,13 +217,21 @@ try:
                 temperature=0,
             )
 
-        print(response.choices[0].message.content)
+        #print(response.choices[0].message.content)
         # --- debug: routing y costo ---
         #print("routing:", response.openrouter_metadata.summary)
         #print("cost:", response.usage.model_dump().get("cost"), "USD")
 
+        responseOpenRouter = response.choices[0].message.content
+        result = OpenRouter_output_verification(responseOpenRouter)
+
+        if result is not None:
+            print(result)
+
+
+
 except FileNotFoundError:
-    print(f"No existe {json_file}")
+    print(f"{json_file} does not exist.")
     sys.exit(1)
 
 
