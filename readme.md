@@ -120,9 +120,11 @@ workload. Instead, `main.py` passes an explicit `order` with 15 providers, order
 by **real cost per run**, grouped by quantization: fp8 first, then fp4, then
 unknown.
 
-An experiment (`test-client-sdk-or.py`) verified the routing: 10 runs, `strategy:
-direct`, StreamLake (position 1 of 15, fp8) selected every time, 7 of 15 providers
-available per call, cost $3µ per run.
+An experiment (`test-client-sdk-or.py`) verified both halves. With
+`sort: "price"`, 5 runs always selected OpenInference — the cheapest **input**,
+fourth most expensive **per run** — confirming the sort keys on input price.
+With our explicit `order`, 10 runs (`strategy: direct`) selected StreamLake
+(position 1 of 15, fp8) every time, 7 of 15 providers available per call.
 
 ### `max_price`
 
@@ -135,23 +137,57 @@ qualifies, the call errors instead of charging.
 Returns which provider actually served the request, so routing claims can be
 checked instead of assumed.
 
-## From 47/50 to 50/50 — the prompt purification
+## From 46/50 to 50/50 — the prompt purification
 
-The scorer made prompt work measurable. Each change touched **one rule at a
-time**, then re-ran all 10 tickets and compared against `labels.json`:
+Tuning happened in two eras.
+
+### Era 1 — manual scoring (before `score.py`)
+
+The system prompt was already on its third rewrite by then (a generic first
+draft, then a product-specific rewrite with concrete categories, P1 and
+escalation rules), tested per-ticket by hand — those runs were never scored.
+The first **full pass over all 10 tickets**, scored by hand against
+`labels.json`, set the baseline:
+
+- First full pass: **46/50** — `004` and `010` came back P2 + escalate (labels say
+  P3 + false): the escalation rules were too broad.
+- Rewrite escalation (define it by *work required*; a reproducible crash in one
+  feature is not an outage) → affected tickets re-run → escalate fixed on both.
+- Redraw the P2/P3 boundary (core flow vs single feature) → priorities fixed on
+  `004`/`010`, broke `003` (re-run covered only the affected tickets, so the
+  totals from this era are partial re-counts, not full passes).
+
+In total the prompt went through **about ten revisions** across both eras — this
+section lists only the milestones that moved the score.
+
+This era uncovered the real problem: **the same prompt gave different answers
+between runs**. Root cause: `temperature` was never set (the plan called for
+0–0.3), so every call sampled differently. Fix: `temperature=0`.
+
+### Era 2 — the scorer (`score.py`)
+
+Automated: all 10 tickets, field by field against `labels.json`, every run saved
+under `runs/`. The scored sequence:
 
 ```
-47 → 49 → 50 → 48 → 49 → 50 → 50 → 50   (last three consecutive)
+47 → 49 → 50 → 48 → 49 → 49 → 50 → 50 → 50   (last three consecutive)
 ```
 
-What each pass fixed:
+Even at `temperature=0`, reruns of the *identical* prompt scored 47, 47 and 49
+with **different tickets failing each time** — residual variance. Suspected
+cause: provider routing (each run can land on a different quantization, fp8 vs
+fp4); never proven. So mid-sequence swings of ±1–2 fields may be noise rather
+than the change made just before them.
+
+What each change fixed (failures taken from the saved `runs/*/score.txt`):
 
 | pass | change | result |
 |---|---|---|
-| 47→49 | *"even if the error is intermittent"* in P2 | `001` stopped falling to P3 |
-| escalations | define escalation by **work required**, and explicitly list signals that do **not** count (customer frustration, "please escalate") | only `007` escalates; stable ever since |
+| 49→50 | *"even if the error is intermittent"* in P2 | `001` stopped falling to P3 |
+| 50→48 | no rule change — pure flapping: two overlapping P2/P3 rules resolved differently | instability isolated to `002` and `003` |
 | 48→49 | **guard on P3**: P3 only applies if no core flow (login, API, webhooks, money) is blocked *or malfunctioning* — kills P3 escapes structurally instead of adding examples | `003` fixed |
-| 49→50 | guard was too broad (*"wrong amount"* swallowed `009`); narrowed to **duplicate charge only** — a wrong plan on an invoice is an invoice correction, not a money malfunction | `002` and `009` both correct |
+| 49→49 | guard too broad: *"wrong amount"* also swallowed wrong-plan invoices | `002` fixed, `009` broke |
+| 49→50 | narrowed to **duplicate charge only** — a wrong plan on an invoice is an invoice correction, not a money malfunction | `002` and `009` both correct |
 
 The lesson: when two rules claim the same ticket, **narrow one of them to match
 the distinction that already exists in the labels** — do not keep piling examples
